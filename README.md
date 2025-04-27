@@ -2,7 +2,8 @@
 
 ## Overview
 
-Deployed Website - https://deep-scan-xfla.vercel.app/
+Deployed Website - [https://deep-scan-xfla.vercel.app/]
+Google Drive Link of the Deployed Model - [https://drive.google.com/drive/folders/1S0s02UC8RsWa13AghDrg8zEFNZvsPYjL?usp=sharing]
 
 This project provides a robust pipeline for detecting **deepfake content** in **images**, **videos**, and **audio** files. By utilizing multiple machine learning models and advanced feature extraction techniques, the system can identify tampered media with high accuracy. The project integrates a **Web Application**, a **Browser Extension**, and a **Flask Backend** for easy user interaction, server-side processing, and efficient feature extraction.
 
