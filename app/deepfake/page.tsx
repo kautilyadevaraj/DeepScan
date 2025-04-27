@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { ImageIcon, Video, AudioLines, ArrowRight } from "lucide-react";
+import { ImageIcon, Video, AudioLines, ArrowRight, Globe } from "lucide-react";
 import {
   Card,
   CardDescription,
@@ -45,6 +45,15 @@ export default function ToolsOverview() {
       href: "/deepfake/audio",
       color: "from-teal-500 to-emerald-500",
       bgColor: "bg-teal-50 dark:bg-teal-950/20",
+    },
+    {
+      title: "Phishing Detection",
+      description:
+        "Identify fraudulent websites and phishing attempts with our security analysis tools.",
+      icon: Globe,
+      href: "/deepfake/phishing",
+      color: "from-orange-500 to-red-500",
+      bgColor: "bg-orange-50 dark:bg-orange-950/20",
     },
   ];
 
@@ -95,7 +104,7 @@ export default function ToolsOverview() {
 
           <div className="flex justify-center mb-6 mt-4">
             <Tabs defaultValue="overview" className="w-full max-w-5xl">
-              <TabsList className="grid w-full grid-cols-4 p-1">
+              <TabsList className="grid w-full grid-cols-5 p-1">
                 <TabsTrigger
                   value="overview"
                   className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500/90 data-[state=active]:to-blue-500/90 data-[state=active]:text-white"
@@ -120,10 +129,16 @@ export default function ToolsOverview() {
                 >
                   Audio
                 </TabsTrigger>
+                <TabsTrigger
+                  value="phishing"
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-red-500 data-[state=active]:text-white"
+                >
+                  Phishing
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="overview" className="mt-6">
                 <motion.div
-                  className="grid gap-6 md:grid-cols-3"
+                  className="grid gap-6 md:grid-cols-2 lg:grid-cols-2"
                   variants={container}
                   initial="hidden"
                   animate="show"
@@ -134,7 +149,9 @@ export default function ToolsOverview() {
                         className={`h-full overflow-hidden transition-all hover:shadow-lg hover:shadow-purple-200/50 dark:hover:shadow-purple-900/20 border border-muted/60 ${tool.bgColor}`}
                       >
                         <CardHeader>
-                          <div className="w-14 h-14 rounded-lg flex items-center justify-center bg-gradient-to-br shadow-md mb-2 p-3 text-white ${tool.color}">
+                          <div
+                            className={`w-14 h-14 rounded-lg flex items-center justify-center bg-gradient-to-br shadow-md mb-2 p-3 text-white ${tool.color}`}
+                          >
                             <tool.icon className="h-8 w-8" />
                           </div>
                           <CardTitle className="mt-2 text-xl">
@@ -337,6 +354,67 @@ export default function ToolsOverview() {
                         className="flex items-center justify-center"
                       >
                         Launch Audio Detection
+                        <motion.div
+                          initial={{ x: 0 }}
+                          whileHover={{ x: 4 }}
+                          transition={{ duration: 0.2 }}
+                          className="ml-2"
+                        >
+                          <ArrowRight className="h-4 w-4" />
+                        </motion.div>
+                      </Link>
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </TabsContent>
+              <TabsContent value="phishing" className="mt-6">
+                <Card className="border bg-orange-50 dark:bg-orange-950/20 border-orange-200/50 dark:border-orange-900/20 overflow-hidden">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-orange-500 to-red-500"></div>
+                  <CardHeader>
+                    <div className="w-14 h-14 rounded-lg flex items-center justify-center bg-gradient-to-br from-orange-500 to-red-500 shadow-md mb-2 p-3 text-white">
+                      <Globe className="h-8 w-8" />
+                    </div>
+                    <CardTitle>Phishing Detection</CardTitle>
+                    <CardDescription>
+                      Identify fraudulent websites and phishing attempts with
+                      our security analysis tools.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4 pt-6">
+                    <p className="font-medium">
+                      Our phishing detection tool analyzes:
+                    </p>
+                    <ul className="grid gap-2">
+                      {[
+                        "Domain age and registration details",
+                        "SSL certificate validity and authenticity",
+                        "Suspicious redirect chains and URL patterns",
+                        "Form elements requesting sensitive information",
+                        "Visual similarity to legitimate websites",
+                      ].map((item, i) => (
+                        <motion.li
+                          key={i}
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: i * 0.1, duration: 0.3 }}
+                          className="flex items-center gap-2"
+                        >
+                          <div className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-orange-500 to-red-500"></div>
+                          <span>{item}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter className="pt-2 pb-6">
+                    <Button
+                      asChild
+                      className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 transition-all duration-300 group"
+                    >
+                      <Link
+                        href="/deepfake/phishing"
+                        className="flex items-center justify-center"
+                      >
+                        Launch Phishing Detection
                         <motion.div
                           initial={{ x: 0 }}
                           whileHover={{ x: 4 }}
