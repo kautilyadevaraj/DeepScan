@@ -19,6 +19,27 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
       if (!imageUrl) return alert("⚠️ Couldn't fetch image source.");
 
+      // Highlight the image with a border
+      imageElement.style.border = "5px solid red";
+
+      // Add loading spinner on the image element (No spinning animation)
+      const spinner = document.createElement("div");
+      spinner.style.position = "absolute";  // Absolutely position it on top of the image
+      spinner.style.top = "50%";
+      spinner.style.left = "50%";
+      spinner.style.transform = "translate(-50%, -50%)"; // Centering the spinner on the media element
+      spinner.style.border = "8px solid #f3f3f3";
+      spinner.style.borderTop = "8px solid #3498db";
+      spinner.style.borderRadius = "50%";
+      spinner.style.width = "50px";
+      spinner.style.height = "50px";
+      spinner.style.zIndex = 10000; // Ensure it's on top of the media element
+      spinner.style.pointerEvents = "none"; // So it won't block interaction with the element
+
+      // Ensure the image is positioned relative so the spinner is positioned correctly within it
+      imageElement.style.position = "relative"; 
+      imageElement.appendChild(spinner);  // Attach the spinner directly to the image
+
       await ensureSandbox();
 
       const resp = await fetch(imageUrl);
@@ -30,16 +51,11 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
       const result = await promise;
 
-      // Optional: preview the resized image
-      const imgPreview = document.createElement("img");
-      imgPreview.src = "data:image/jpeg;base64," + result.base64;
-      imgPreview.style.position = "fixed";
-      imgPreview.style.bottom = "10px";
-      imgPreview.style.right = "10px";
-      imgPreview.style.border = "3px solid green";
-      imgPreview.style.maxWidth = "150px";
-      imgPreview.style.zIndex = 9999;
-      document.body.appendChild(imgPreview);
+      // Remove loading spinner after receiving result
+      imageElement.removeChild(spinner);
+
+      // Remove the border highlight
+      imageElement.style.border = "";
 
       // 🚀 Send to backend for detection
       try {
@@ -92,6 +108,12 @@ chrome.runtime.onMessage.addListener(async (message) => {
   }
 });
 
+// Remove spinner animation (No spinning effect)
+const style = document.createElement('style');
+style.innerHTML = `
+  /* Removed spinning animation, just a static loader */
+`;
+document.head.appendChild(style);
 
 function detectElementTypeAtClick(x, y) {
   let el = document.elementFromPoint(x, y);
