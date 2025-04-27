@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, ImageIcon, Video, AudioLines } from "lucide-react";
+import { Home, ImageIcon, Video, AudioLines, ShieldAlert } from "lucide-react";
 import { ModeToggle } from "./mode.toggle";
 import Image from "next/image";
 import DarkLogo from "@/public/dark_logo.png"
@@ -50,6 +50,13 @@ export function SiteHeader() {
             >
               <AudioLines className="h-4 w-4" />
               <span>Audio</span>
+            </Link>
+            <Link
+              href="/deepfake/phishing"
+              className="hidden md:flex items-center gap-1 transition-colors hover:text-foreground/80"
+            >
+              <ShieldAlert className="h-4 w-4" />
+              <span>Phishing</span>
             </Link>
           </nav>
         </div>

@@ -1,6 +1,5 @@
-// app/api/audio/route.ts
-
 import { NextResponse } from "next/server";
+import FormData from "form-data";
 
 interface PredictionResponse {
   final_prediction: string;
@@ -9,7 +8,7 @@ interface PredictionResponse {
   model_confidence: number;
   heuristic_prediction: string;
   heuristic_confidence: number;
-  heuristic_scores: number[];
+  heuristic_scores: { [key: string]: number };
 }
 
 export async function POST(req: Request) {
@@ -21,16 +20,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "No audio provided" }, { status: 400 });
     }
 
-    const payload = {
-      image: audioData,
-    };
+    // Convert base64 audio data to Buffer
+    const buffer = Buffer.from(audioData, "base64");
 
-    const response = await fetch("http://172.16.239.97:5000/predict_audio", {
+    // Create FormData and append the audio file
+    const form = new FormData();
+    form.append("audio", buffer, { filename: "audio.wav" });
+
+    // Send request to Flask backend
+    const response = await fetch("http://127.0.0.1:5000/predict_audio", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
+      headers: form.getHeaders(),
+      body: form.getBuffer(),
     });
 
     if (!response.ok) {
@@ -40,37 +41,18 @@ export async function POST(req: Request) {
       );
     }
 
-    const modelResult = await response.json();
+    // Parse the backend's complete response
+    const result = await response.json();
 
-    const heuristicResult = {
-      prediction: "fake",
-      confidence: 0.8,
-      scores: [0.1, 0.2, 0.3],
-    };
-
-    let finalPrediction = "";
-    let finalConfidence = 0;
-
-    if (modelResult.prediction === "real") {
-      const combinedProb =
-        modelResult.real_prob * 0.7 + (1 - heuristicResult.confidence) * 0.3;
-      finalPrediction = combinedProb > 0.5 ? "real" : "fake";
-      finalConfidence = Math.max(combinedProb, 1 - combinedProb);
-    } else {
-      const combinedProb =
-        modelResult.fake_prob * 0.7 + heuristicResult.confidence * 0.3;
-      finalPrediction = combinedProb > 0.5 ? "fake" : "real";
-      finalConfidence = Math.max(combinedProb, 1 - combinedProb);
-    }
-
+    // Return the backend's result directly
     return NextResponse.json<PredictionResponse>({
-      final_prediction: finalPrediction,
-      final_confidence: finalConfidence,
-      model_prediction: modelResult.prediction,
-      model_confidence: Math.max(modelResult.real_prob, modelResult.fake_prob),
-      heuristic_prediction: heuristicResult.prediction,
-      heuristic_confidence: heuristicResult.confidence,
-      heuristic_scores: heuristicResult.scores,
+      final_prediction: result.final_prediction,
+      final_confidence: result.final_confidence,
+      model_prediction: result.model_prediction,
+      model_confidence: result.model_confidence,
+      heuristic_prediction: result.heuristic_prediction,
+      heuristic_confidence: result.heuristic_confidence,
+      heuristic_scores: result.heuristic_scores,
     });
   } catch (error) {
     console.error(error);

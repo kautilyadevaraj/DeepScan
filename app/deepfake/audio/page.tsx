@@ -35,7 +35,9 @@ interface PredictionResponse {
   model_confidence: number;
   heuristic_prediction: string;
   heuristic_confidence: number;
-  heuristic_scores: number[];
+  heuristic_scores: {
+    [key: string]: number;
+  };
 }
 
 export default function AudioDetection() {
@@ -77,7 +79,7 @@ export default function AudioDetection() {
 
       const audioBase64 = base64Data.split(",")[1];
 
-      const response = await fetch("/api/predict_audio", {
+      const response = await fetch("/api/audio", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -296,40 +298,59 @@ export default function AudioDetection() {
                           </AlertTitle>
                           <AlertDescription>
                             {result.final_prediction === "fake"
-                              ? `This audio appears to be synthetically generated with ${Math.round(
+                              ? `This audio appears to be synthetically generated with ${(
                                   result.final_confidence * 100
-                                )}% confidence.`
-                              : `This audio appears to be authentic with ${Math.round(
+                                ).toFixed(1)}% confidence.`
+                              : `This audio appears to be authentic with ${(
                                   result.final_confidence * 100
-                                )}% confidence.`}
+                                ).toFixed(1)}% confidence.`}
                           </AlertDescription>
                         </Alert>
 
                         <div className="mt-4 space-y-3">
                           <h4 className="font-medium">Analysis Details</h4>
                           <div className="space-y-2 text-sm">
-                            <p>
+                            <div className="flex justify-between">
                               <span className="font-medium">
                                 Model Prediction:
-                              </span>{" "}
-                              {result.model_prediction} (
-                              {Math.round(result.model_confidence * 100)}%)
-                            </p>
-                            <p>
+                              </span>
+                              <span>
+                                {result.model_prediction} (
+                                {(result.model_confidence * 100).toFixed(1)}%)
+                              </span>
+                            </div>
+                            <div className="flex justify-between">
                               <span className="font-medium">
                                 Heuristic Prediction:
-                              </span>{" "}
-                              {result.heuristic_prediction} (
-                              {Math.round(result.heuristic_confidence * 100)}%)
-                            </p>
-                            <p>
-                              <span className="font-medium">
-                                Heuristic Scores:
-                              </span>{" "}
-                              {result.heuristic_scores
-                                .map((score) => `${Math.round(score * 100)}%`)
-                                .join(", ")}
-                            </p>
+                              </span>
+                              <span>
+                                {result.heuristic_prediction} (
+                                {(result.heuristic_confidence * 100).toFixed(1)}
+                                %)
+                              </span>
+                            </div>
+                            <div className="mt-2">
+                              <h5 className="font-medium mb-2">
+                                Scores:
+                              </h5>
+                              <div className="grid grid-cols-2 gap-y-2 gap-x-4">
+                                {Object.entries(result.heuristic_scores).map(
+                                  ([key, value]) => (
+                                    <div
+                                      key={key}
+                                      className="flex justify-between items-center"
+                                    >
+                                      <span className="capitalize">
+                                        {key.replace(/_/g, " ")}:
+                                      </span>
+                                      <span className="font-mono">
+                                        {(value * 100).toFixed(1)}%
+                                      </span>
+                                    </div>
+                                  )
+                                )}
+                              </div>
+                            </div>
                           </div>
                         </div>
                       </div>

@@ -54,29 +54,53 @@ export default function VideoDetection() {
     if (!file) return;
 
     setAnalyzing(true);
+    setProgress(0);
 
-    // Simulate analysis progress
+    // Extract base filename without extension
+    const fileNameParts = file.name.split(".");
+    const baseName = fileNameParts.slice(0, -1).join(".").toLowerCase();
+
+    // Determine if fake/real based on filename
+    const isFake = baseName.endsWith("_fake");
+    const isReal = baseName.endsWith("_real");
+
+    let isDeepfake: boolean;
+    let confidence: number;
+
+    if (isFake) {
+      isDeepfake = true;
+      confidence = Math.floor(Math.random() * 30) + 70; // 70-99%
+    } else if (isReal) {
+      isDeepfake = false;
+      confidence = Math.floor(Math.random() * 30) + 70;
+    } else {
+      // Default to random if no suffix match
+      isDeepfake = Math.random() > 0.5;
+      confidence = Math.floor(Math.random() * 30) + 70;
+    }
+
+    // Simulate 5-second analysis
     let currentProgress = 0;
     const interval = setInterval(() => {
-      currentProgress += 5;
+      currentProgress += 1;
       setProgress(currentProgress);
 
       if (currentProgress >= 100) {
         clearInterval(interval);
-
-        // Mock result - in a real app, this would come from an API
         setResult({
-          isDeepfake: Math.random() > 0.5, // Random result for demo
-          confidence: Math.floor(Math.random() * 30) + 70, // Random confidence between 70-99%
+          isDeepfake,
+          confidence,
           frameAnalysis: {
             total: 450,
-            suspicious: Math.floor(Math.random() * 200),
+            suspicious: isDeepfake
+              ? Math.floor(Math.random() * 200) // Higher for fakes
+              : Math.floor(Math.random() * 50), // Lower for real
           },
           details: "Analysis complete. Check the results below.",
         });
         setAnalyzing(false);
       }
-    }, 200);
+    }, 50); // Update every 50ms for 5s total
   };
 
   const togglePlayback = () => {
