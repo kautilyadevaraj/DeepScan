@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const base64String = Buffer.from(arrayBuffer).toString("base64");
 
     // Send to your backend API
-    const response = await fetch("http://172.16.239.97:5000/predict", {
+    const response = await fetch("http://127.0.0.1:5000/predict", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
