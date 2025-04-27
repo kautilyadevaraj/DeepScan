@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self';
+                 script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline' 'wasm-unsafe-eval' blob:;
+                 connect-src https://cdn.jsdelivr.net;
+                 object-src 'self'">
+  <script>
+    const indexURL = "https://cdn.jsdelivr.net/pyodide/v0.23.4/full/";
+  </script>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.23.4/full/pyodide.js"></script>
+
+  <script>
+    const pyodideReady = loadPyodide({ indexURL }).then(async (pyodide) => {
+      await pyodide.loadPackage(["pillow"]);
+      return pyodide;
+    });
+
+    window.addEventListener("message", async (evt) => {
+      const { id, imageBytes } = evt.data;
+      const py = await pyodideReady;
+
+      py.globals.set("image_bytes", new Uint8Array(imageBytes));
+
+      const base64_result = py.runPython(`
+        import io, base64
+        from PIL import Image
+
+        img = Image.open(io.BytesIO(bytes(image_bytes)))
+        img = img.resize((256, 256)).convert("RGB")
+
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=85)
+        base64.b64encode(buf.getvalue()).decode("utf-8")
+      `);
+
+      window.parent.postMessage({ id, result: { base64: base64_result } }, "*");
+    });
+  </script>
+</head>
+<body></body>
+</html>

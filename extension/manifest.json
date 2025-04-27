@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Deepfake Detector",
+  "version": "1.0",
+  "permissions": ["contextMenus", "activeTab", "scripting"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "sandbox": {
+    "pages": ["sandbox.html"]
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["sandbox.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "content_security_policy": {
+  "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';",
+  "sandbox": "sandbox allow-scripts; script-src 'self' https://cdn.jsdelivr.net 'unsafe-inline' 'wasm-unsafe-eval' blob:; object-src 'self'; connect-src https://cdn.jsdelivr.net;"
+}
+}
